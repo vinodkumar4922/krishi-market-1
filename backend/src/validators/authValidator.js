@@ -14,7 +14,7 @@ const handleValidationErrors = (req, res, next) => {
 
 const validateConsumerSignup = [
   body('name').trim().notEmpty().withMessage('Name is required').isLength({ min: 2, max: 100 }).withMessage('Name must be between 2 and 100 characters'),
-  body('email').trim().isEmail().withMessage('Valid email address required').normalizeEmail(),
+  body('email').trim().isEmail().withMessage('Valid email address required').normalizeEmail({ gmail_remove_dots: false }),
   body('phone').trim().notEmpty().withMessage('Phone number is required').matches(/^[0-9+-\s]{8,20}$/).withMessage('Valid phone format required'),
   body('password')
     .isLength({ min: 6 })
@@ -24,7 +24,7 @@ const validateConsumerSignup = [
 
 const validateFarmerSignup = [
   body('name').trim().notEmpty().withMessage('Name is required').isLength({ min: 2, max: 100 }),
-  body('email').trim().isEmail().withMessage('Valid email address required').normalizeEmail(),
+  body('email').trim().isEmail().withMessage('Valid email address required').normalizeEmail({ gmail_remove_dots: false }),
   body('phone').trim().notEmpty().withMessage('Phone number is required').matches(/^[0-9+-\s]{8,20}$/).withMessage('Valid phone format required'),
   body('password').isLength({ min: 6 }).withMessage('Password must be at least 6 characters long'),
   body('farmLocation.address').trim().notEmpty().withMessage('Farm address is required'),
@@ -39,7 +39,7 @@ const validateFarmerSignup = [
 ];
 
 const validateLogin = [
-  body('email').trim().isEmail().withMessage('Valid email is required').normalizeEmail(),
+  body('email').trim().isEmail().withMessage('Valid email is required').normalizeEmail({ gmail_remove_dots: false }),
   body('password').notEmpty().withMessage('Password is required'),
   handleValidationErrors,
 ];

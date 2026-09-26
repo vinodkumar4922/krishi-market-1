@@ -143,6 +143,7 @@ const login = async ({ email, password, ipAddress, userAgent }) => {
     } else if (
       normalizedEmail === 'consumer' ||
       normalizedEmail === 'anita.consumer@gmail.com' ||
+      normalizedEmail === 'anitaconsumer@gmail.com' ||
       normalizedEmail === 'anita.sharma@consumer.demo' ||
       normalizedEmail === 'consumer1@krishimarket.demo'
     ) {

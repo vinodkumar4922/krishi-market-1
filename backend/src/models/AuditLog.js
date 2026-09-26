@@ -5,7 +5,8 @@ const auditLogSchema = new mongoose.Schema(
     actor: {
       type: mongoose.Schema.Types.ObjectId,
       ref: 'User',
-      required: true,
+      required: false,
+      default: null,
     },
     action: {
       type: String,
@@ -19,7 +20,8 @@ const auditLogSchema = new mongoose.Schema(
     },
     resourceId: {
       type: String,
-      required: true,
+      required: false,
+      default: 'SYSTEM',
     },
     details: {
       type: mongoose.Schema.Types.Mixed,

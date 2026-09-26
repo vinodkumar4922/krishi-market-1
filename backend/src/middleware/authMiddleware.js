@@ -48,4 +48,26 @@ const authenticate = async (req, res, next) => {
   }
 };
 
-module.exports = { authenticate };
+const authenticateOptional = async (req, res, next) => {
+  try {
+    const authHeader = req.headers.authorization;
+    if (authHeader && authHeader.startsWith('Bearer ')) {
+      const token = authHeader.split(' ')[1];
+      try {
+        const decoded = verifyAccessToken(token);
+        const user = await User.findById(decoded.id);
+        if (user && user.accountStatus !== 'SUSPENDED') {
+          req.user = user;
+        }
+      } catch (err) {
+        // Silently proceed for optional auth
+      }
+    }
+    next();
+  } catch (error) {
+    next();
+  }
+};
+
+module.exports = { authenticate, authenticateOptional };
+

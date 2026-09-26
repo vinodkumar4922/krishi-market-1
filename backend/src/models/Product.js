@@ -100,6 +100,12 @@ const productSchema = new mongoose.Schema(
   }
 );
 
+// High-performance compound indexes for marketplace filters and search
+productSchema.index({ category: 1, isActive: 1, availabilityStatus: 1 });
+productSchema.index({ farmer: 1, isActive: 1 });
+productSchema.index({ price: 1, createdAt: -1 });
+productSchema.index({ name: 'text', description: 'text' });
+
 // Dynamic stock status synchronization hook
 productSchema.pre('save', function (next) {
   if (this.quantity <= 0) {

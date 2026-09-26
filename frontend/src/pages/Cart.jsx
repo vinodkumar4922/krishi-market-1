@@ -11,7 +11,6 @@ import {
   ArrowRight,
   ShieldCheck,
   MapPin,
-  Clock,
   AlertCircle,
   CheckCircle2,
 } from 'lucide-react';
@@ -28,14 +27,35 @@ const Cart = () => {
   const [city, setCity] = useState('Bengaluru');
   const [state, setState] = useState('Karnataka');
   const [pincode, setPincode] = useState('560103');
-  const [deliveryDate, setDeliveryDate] = useState(
+  const [deliveryDate, setDeliveryDate] = useState(() =>
     new Date(Date.now() + 86400000).toISOString().split('T')[0]
   );
-  const [deliverySlot, setDeliverySlot] = useState('08:00 AM – 10:00 AM');
+  const [deliverySlot, setDeliverySlot] = useState('08:00–10:00');
 
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [orderSuccess, setOrderSuccess] = useState(null);
+
+  const [deliverySlots, setDeliverySlots] = useState([]);
+
+  // Fetch dynamic slots with capacity
+  useEffect(() => {
+    const fetchSlots = async () => {
+      try {
+        const res = await api.get('/delivery-slots', { params: { date: deliveryDate } });
+        if (res.data.success && res.data.data) {
+          setDeliverySlots(res.data.data);
+          const firstAvailable = res.data.data.find((s) => s.isAvailable);
+          if (firstAvailable) {
+            setDeliverySlot(firstAvailable.slotName);
+          }
+        }
+      } catch (e) {
+        console.error('Failed to load slots:', e);
+      }
+    };
+    fetchSlots();
+  }, [deliveryDate]);
 
   const deliveryFee = subtotal >= 500 ? 0 : 40;
   const total = subtotal + deliveryFee;
@@ -45,8 +65,8 @@ const Cart = () => {
     const fId = item.product.farmer?._id || 'unknown';
     if (!acc[fId]) {
       acc[fId] = {
-        farmerName: item.product.farmer?.user?.name || 'Verified Farmer',
-        district: item.product.farmer?.farmLocation?.district || 'Regional',
+        farmerName: item.product.farmer?.user?.name || item.product.farmer?.farmName || 'Verified Producer',
+        district: item.product.farmer?.farmLocation?.district || 'Regional Farm',
         items: [],
       };
     }
@@ -130,12 +150,20 @@ const Cart = () => {
           </div>
         </div>
 
-        <Link
-          to="/marketplace"
-          className="inline-flex items-center gap-2 px-6 py-3 bg-krishi-600 hover:bg-krishi-700 text-white font-bold rounded-xl shadow transition"
-        >
-          Continue Shopping <ArrowRight className="w-4 h-4" />
-        </Link>
+        <div className="flex flex-col sm:flex-row gap-3 justify-center">
+          <Link
+            to={`/orders/${orderSuccess._id}`}
+            className="inline-flex items-center justify-center gap-2 px-6 py-3 bg-krishi-600 hover:bg-krishi-700 text-white font-bold rounded-xl shadow transition text-sm"
+          >
+            Track Order Status <ArrowRight className="w-4 h-4" />
+          </Link>
+          <Link
+            to="/orders"
+            className="inline-flex items-center justify-center gap-2 px-6 py-3 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold rounded-xl transition text-sm"
+          >
+            View All Orders
+          </Link>
+        </div>
       </div>
     );
   }
@@ -354,11 +382,25 @@ const Cart = () => {
                   onChange={(e) => setDeliverySlot(e.target.value)}
                   className="w-full px-2 py-2 rounded-xl border border-slate-200 text-xs font-semibold"
                 >
-                  <option value="08:00 AM – 10:00 AM">08:00 AM – 10:00 AM</option>
-                  <option value="10:00 AM – 12:00 PM">10:00 AM – 12:00 PM</option>
-                  <option value="12:00 PM – 02:00 PM">12:00 PM – 02:00 PM</option>
-                  <option value="04:00 PM – 06:00 PM">04:00 PM – 06:00 PM</option>
-                  <option value="06:00 PM – 08:00 PM">06:00 PM – 08:00 PM</option>
+                  {deliverySlots.length > 0 ? (
+                    deliverySlots.map((slot) => (
+                      <option
+                        key={slot._id || slot.slotName}
+                        value={slot.slotName}
+                        disabled={!slot.isAvailable}
+                      >
+                        {slot.slotName} {!slot.isAvailable ? '(Fully Booked)' : `(${slot.remainingCapacity} left)`}
+                      </option>
+                    ))
+                  ) : (
+                    <>
+                      <option value="08:00–10:00">08:00–10:00</option>
+                      <option value="10:00–12:00">10:00–12:00</option>
+                      <option value="12:00–14:00">12:00–14:00</option>
+                      <option value="16:00–18:00">16:00–18:00</option>
+                      <option value="18:00–20:00">18:00–20:00</option>
+                    </>
+                  )}
                 </select>
               </div>
             </div>

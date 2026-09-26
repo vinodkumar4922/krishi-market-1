@@ -17,17 +17,22 @@ const seedFullDemoData = async () => {
 
     console.log('🌾 Starting comprehensive realistic demo dataset seeding...');
 
-    // 1. Admin
-    let admin = await User.findOne({ email: 'admin@krishimarket.demo' });
-    if (!admin) {
-      admin = await User.create({
-        name: 'Krishi Market Admin',
-        email: 'admin@krishimarket.demo',
-        phone: '+91 9876543210',
-        passwordHash: 'Admin@123456',
-        role: 'ADMIN',
-        accountStatus: 'ACTIVE',
-      });
+    // 1. Admin (Support both .demo and .org domain aliases)
+    const adminEmails = ['admin@krishimarket.demo', 'admin@krishimarket.org'];
+    let admin = null;
+    for (const email of adminEmails) {
+      let a = await User.findOne({ email });
+      if (!a) {
+        a = await User.create({
+          name: 'Krishi Market SuperAdmin',
+          email,
+          phone: '+91 9876543210',
+          passwordHash: 'Admin@123456',
+          role: 'ADMIN',
+          accountStatus: 'ACTIVE',
+        });
+      }
+      if (!admin) admin = a;
     }
 
     // 2. Categories
@@ -65,6 +70,32 @@ const seedFullDemoData = async () => {
         exp: 15,
         rating: 4.9,
         reviewsCount: 32,
+      },
+      {
+        name: 'Ramesh Patel',
+        email: 'ramesh.farmer@krishi.org',
+        phone: '+91 9845012346',
+        location: { address: 'Green Valley Farm', district: 'Vijayapura', state: 'Karnataka', pincode: '586130' },
+        farmingMethod: 'ORGANIC',
+        status: 'APPROVED',
+        crops: ['Grapes', 'Pomegranate', 'Tomatoes'],
+        acres: 10,
+        exp: 12,
+        rating: 4.9,
+        reviewsCount: 20,
+      },
+      {
+        name: 'Ramesh Patil',
+        email: 'ramesh.patil@farmer.demo',
+        phone: '+91 9845012347',
+        location: { address: 'Farm Zone 2', district: 'Vijayapura', state: 'Karnataka', pincode: '586130' },
+        farmingMethod: 'ORGANIC',
+        status: 'APPROVED',
+        crops: ['Organic Grapes', 'Pomegranate'],
+        acres: 8,
+        exp: 10,
+        rating: 4.8,
+        reviewsCount: 15,
       },
       {
         name: 'Suresh Gowda',
@@ -153,9 +184,11 @@ const seedFullDemoData = async () => {
       farmerDocs.push(farmerDoc);
     }
 
-    // 4. Consumers (3 required profiles)
+    // 4. Consumers
     const consumersSeed = [
       { name: 'Anita Sharma', email: 'consumer1@krishimarket.demo', phone: '+91 9880011223' },
+      { name: 'Anita Sharma', email: 'anita.consumer@gmail.com', phone: '+91 9880011224' },
+      { name: 'Anita Sharma', email: 'anita.sharma@consumer.demo', phone: '+91 9880011225' },
       { name: 'Vikram Joshi', email: 'consumer2@krishimarket.demo', phone: '+91 9880022334' },
       { name: 'Meera Nambiar', email: 'consumer3@krishimarket.demo', phone: '+91 9880033445' },
     ];

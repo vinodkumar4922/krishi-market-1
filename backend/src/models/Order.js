@@ -102,4 +102,9 @@ const orderSchema = new mongoose.Schema(
   }
 );
 
+// High-performance compound indexes for order monitoring and customer order history
+orderSchema.index({ consumer: 1, createdAt: -1 });
+orderSchema.index({ farmersInvolved: 1, status: 1 });
+orderSchema.index({ status: 1, createdAt: -1 });
+
 module.exports = mongoose.model('Order', orderSchema);

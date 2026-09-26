@@ -59,10 +59,21 @@ const farmerSchema = new mongoose.Schema(
       maxlength: 1000,
       default: '',
     },
+    farmName: {
+      type: String,
+      trim: true,
+      default: '',
+    },
+    profileImage: {
+      type: String,
+      trim: true,
+      default: '',
+    },
     rating: {
       average: { type: Number, default: 0, min: 0, max: 5 },
       count: { type: Number, default: 0 },
     },
+
   },
   {
     timestamps: true,

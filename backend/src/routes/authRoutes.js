@@ -4,6 +4,8 @@ const {
   registerConsumer,
   registerFarmer,
   login,
+  refreshToken,
+  logout,
   getCurrentUser,
 } = require('../controllers/authController');
 const {
@@ -18,8 +20,11 @@ const { authLimiter } = require('../middleware/rateLimiter');
 router.post('/signup/consumer', authLimiter, validateConsumerSignup, registerConsumer);
 router.post('/signup/farmer', authLimiter, validateFarmerSignup, registerFarmer);
 router.post('/login', authLimiter, validateLogin, login);
+router.post('/refresh', authLimiter, refreshToken);
+router.post('/logout', logout);
 
 // Authenticated user profile
 router.get('/me', authenticate, getCurrentUser);
 
 module.exports = router;
+
